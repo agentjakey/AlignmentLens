@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import './App.css'
 import Header from './components/Header'
 import GoalInput from './components/GoalInput'
@@ -9,14 +9,29 @@ import TrueObjective from './components/TrueObjective'
 import BlueDotTags from './components/BlueDotTags'
 import SharePanel from './components/SharePanel'
 import EmptyState from './components/EmptyState'
+import IntroAnimation from './components/IntroAnimation'
+import Footer from './components/Footer'
+
+const hasSeenIntro = () => {
+  try { return sessionStorage.getItem('al_intro_seen') === '1' } catch { return false }
+}
+const markIntroSeen = () => {
+  try { sessionStorage.setItem('al_intro_seen', '1') } catch {}
+}
 
 export default function App() {
+  const [showIntro, setShowIntro] = useState(!hasSeenIntro())
   const [goal, setGoal] = useState('')
   const [domain, setDomain] = useState('Social media platform')
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
   const [rateLimited, setRateLimited] = useState(false)
+
+  const handleIntroDone = useCallback(() => {
+    markIntroSeen()
+    setShowIntro(false)
+  }, [])
 
   async function handleSubmit() {
     if (!goal.trim() || goal.trim().length < 3) return
@@ -61,78 +76,84 @@ export default function App() {
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px 64px' }}>
-      <Header />
+    <>
+      {showIntro && <IntroAnimation onDone={handleIntroDone} />}
 
-      <GoalInput
-        goal={goal}
-        setGoal={setGoal}
-        domain={domain}
-        setDomain={setDomain}
-        onSubmit={handleSubmit}
-        loading={loading}
-        onExample={fillExample}
-      />
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 16px' }}>
+        <Header />
 
-      {rateLimited && (
-        <div style={{
-          background: 'rgba(217,119,6,0.1)',
-          border: '1px solid var(--caution)',
-          color: '#fcd34d',
-          padding: '16px 20px',
-          marginTop: 16,
-          lineHeight: 1.7,
-        }}>
-          <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 14 }}>
-            ⏱ Hourly limit reached
+        <GoalInput
+          goal={goal}
+          setGoal={setGoal}
+          domain={domain}
+          setDomain={setDomain}
+          onSubmit={handleSubmit}
+          loading={loading}
+          onExample={fillExample}
+        />
+
+        {rateLimited && (
+          <div style={{
+            background: 'rgba(217,119,6,0.1)',
+            border: '1px solid var(--caution)',
+            color: '#fcd34d',
+            padding: '16px 20px',
+            marginTop: 16,
+            lineHeight: 1.7,
+          }}>
+            <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 14 }}>
+              ⏱ Hourly limit reached
+            </div>
+            <div style={{ fontSize: 13, color: '#fde68a' }}>
+              You've run 5 analyses this hour — the limit keeps this demo free for everyone.
+              Come back in an hour, or{' '}
+              <a
+                href="https://github.com/agentjakey/alignmentLens"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+              >
+                clone the repo
+              </a>
+              {' '}and run it locally with your own API key.
+            </div>
           </div>
-          <div style={{ fontSize: 13, color: '#fde68a' }}>
-            You've run 5 analyses this hour — the limit keeps this demo free for everyone.
-            Come back in an hour, or{' '}
-            <a
-              href="https://github.com/agentjakey/alignmentLens"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: 'var(--primary)', textDecoration: 'underline' }}
-            >
-              clone the repo
-            </a>
-            {' '}and run it locally with your own API key.
+        )}
+
+        {error && (
+          <div style={{
+            background: 'var(--danger-dim)',
+            border: '1px solid var(--danger)',
+            color: '#fca5a5',
+            padding: '12px 16px',
+            marginTop: 16,
+            fontSize: 14,
+          }}>
+            ⚠ {error}
           </div>
-        </div>
-      )}
+        )}
 
-      {error && (
-        <div style={{
-          background: 'var(--danger-dim)',
-          border: '1px solid var(--danger)',
-          color: '#fca5a5',
-          padding: '12px 16px',
-          marginTop: 16,
-          fontSize: 14,
-        }}>
-          ⚠ {error}
-        </div>
-      )}
+        {loading && <LoadingState />}
 
-      {loading && <LoadingState />}
+        {!loading && !results && !error && !rateLimited && (
+          <EmptyState onSelect={fillExample} />
+        )}
 
-      {!loading && !results && !error && !rateLimited && (
-        <EmptyState onSelect={fillExample} />
-      )}
+        {results && !loading && (
+          <>
+            <ScorePanel scores={results.scores} />
+            <ActionTimeline
+              naive={results.naive_agent?.actions || []}
+              overseen={results.overseen_agent?.actions || []}
+            />
+            <TrueObjective text={results.true_objective} goal={results.goal} />
+            <BlueDotTags tags={results.bluedot_tags || []} />
+            <SharePanel results={results} />
+          </>
+        )}
 
-      {results && !loading && (
-        <>
-          <ScorePanel scores={results.scores} />
-          <ActionTimeline
-            naive={results.naive_agent?.actions || []}
-            overseen={results.overseen_agent?.actions || []}
-          />
-          <TrueObjective text={results.true_objective} goal={results.goal} />
-          <BlueDotTags tags={results.bluedot_tags || []} />
-          <SharePanel results={results} />
-        </>
-      )}
-    </div>
+        <Footer />
+      </div>
+    </>
   )
 }
