@@ -216,3 +216,54 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Secrets (never commit)
+*.key
+*.pem
+
+# Node / React
+node_modules/
+frontend/dist/
+frontend/build/
+.npm
+
+# Replit (keep .replit for reproducibility, ignore runtime files)
+.upm/
+.cache/
+replit.nix
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
