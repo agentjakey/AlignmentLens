@@ -240,7 +240,6 @@ build/
 
 # Node / React
 node_modules/
-frontend/dist/
 frontend/build/
 .npm
 
