@@ -4,7 +4,7 @@
 
 > You don't need a background in AI to use this. You need 30 seconds and a goal.
 
-🔗 **[Live Demo](fill here)**
+🔗 **[Live Demo](https://alignmentlens-production.up.railway.app/)**
 📁 **[GitHub](https://github.com/agentjakey/AlignmentLens)**
 
 ![visitors](https://visitor-badge.laobi.icu/badge?page_id=agentjakey.AlignmentLens)
