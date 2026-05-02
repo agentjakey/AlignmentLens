@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
+pip install -r requirements.txt
+
 echo "==> Building frontend..."
-cd /home/runner/workspace/frontend
-npm run build
+cd frontend && npm install && npm run build && cd ..
 
 echo "==> Starting server on port 5000..."
-cd /home/runner/workspace
-/home/runner/workspace/.pythonlibs/bin/uvicorn main:app --host 0.0.0.0 --port 5000
+uvicorn main:app --host 0.0.0.0 --port 5000
