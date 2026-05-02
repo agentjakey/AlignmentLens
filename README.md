@@ -6,7 +6,7 @@
 
 > Built on the BlueDot Impact Technical AI Safety curriculum - Units 1–6
 
-> This is prompt-based simulation: Claude is asked to reason about misaligned behavior, not trained to exhibit it. The patterns it generates reflect documented real-world cases of specification gaming."
+> This is prompt-based simulation: Claude is asked to reason about misaligned behavior, not trained to exhibit it. The patterns it generates reflect documented real-world cases of specification gaming.
 
 ![visitors](https://visitor-badge.laobi.icu/badge?page_id=agentjakey.AlignmentLens)
 ![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)
