@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #050510;
+  --surface: #0d0d1f;
+  --border: #1e1e3f;
+  --primary: #7c3aed;
+  --primary-dim: rgba(124, 58, 237, 0.15);
+  --danger: #dc2626;
+  --danger-dim: rgba(220, 38, 38, 0.15);
+  --caution: #d97706;
+  --caution-dim: rgba(217, 119, 6, 0.15);
+  --safe: #16a34a;
+  --safe-dim: rgba(22, 163, 74, 0.15);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.01) 2px,
+    rgba(255, 255, 255, 0.01) 4px
+  );
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+textarea, input, select {
+  font-family: var(--font-body);
+}
+
+.mono {
+  font-family: var(--font-mono);
+}
+
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes barFill {
+  from { width: 0%; }
+  to   { width: var(--target-width); }
+}
+
+.animate-fade-slide {
+  animation: fadeSlideUp 0.4s ease forwards;
+}

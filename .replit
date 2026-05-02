@@ -1,4 +1,4 @@
-modules = ["python-3.11"]
+modules = ["python-3.11", "nodejs-20"]
 [agent]
 expertMode = true
 stack = "BEST_EFFORT_FALLBACK"
@@ -10,6 +10,10 @@ packages = ["libxcrypt"]
 [[ports]]
 localPort = 8000
 externalPort = 8000
+
+[[ports]]
+localPort = 5000
+externalPort = 80
 
 [workflows]
 runButton = "Project"
@@ -27,10 +31,10 @@ args = "Start application"
 name = "Start application"
 author = "agent"
 
+[workflows.workflow.metadata]
+outputType = "webview"
+
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "/home/runner/workspace/.pythonlibs/bin/uvicorn main:app --host 0.0.0.0 --port 8000"
-waitForPort = 8000
-
-[workflows.workflow.metadata]
-outputType = "console"
+args = "bash /home/runner/workspace/start.sh"
+waitForPort = 5000
