@@ -16,12 +16,14 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
+  const [rateLimited, setRateLimited] = useState(false)
 
   async function handleSubmit() {
     if (!goal.trim() || goal.trim().length < 3) return
     setLoading(true)
     setResults(null)
     setError(null)
+    setRateLimited(false)
 
     try {
       const response = await fetch(`${window.location.origin}/analyze`, {
@@ -29,10 +31,18 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ goal: goal.trim(), domain }),
       })
+
+      if (response.status === 429) {
+        setRateLimited(true)
+        setLoading(false)
+        return
+      }
+
       if (!response.ok) {
         const err = await response.json()
         throw new Error(err.detail || 'Analysis failed')
       }
+
       const data = await response.json()
       setResults(data)
     } catch (e) {
@@ -47,6 +57,7 @@ export default function App() {
     setDomain(exDomain)
     setResults(null)
     setError(null)
+    setRateLimited(false)
   }
 
   return (
@@ -63,6 +74,34 @@ export default function App() {
         onExample={fillExample}
       />
 
+      {rateLimited && (
+        <div style={{
+          background: 'rgba(217,119,6,0.1)',
+          border: '1px solid var(--caution)',
+          color: '#fcd34d',
+          padding: '16px 20px',
+          marginTop: 16,
+          lineHeight: 1.7,
+        }}>
+          <div style={{ fontWeight: 700, marginBottom: 4, fontSize: 14 }}>
+            ⏱ Hourly limit reached
+          </div>
+          <div style={{ fontSize: 13, color: '#fde68a' }}>
+            You've run 5 analyses this hour — the limit keeps this demo free for everyone.
+            Come back in an hour, or{' '}
+            <a
+              href="https://github.com/agentjakey/alignmentLens"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: 'var(--primary)', textDecoration: 'underline' }}
+            >
+              clone the repo
+            </a>
+            {' '}and run it locally with your own API key.
+          </div>
+        </div>
+      )}
+
       {error && (
         <div style={{
           background: 'var(--danger-dim)',
@@ -78,7 +117,7 @@ export default function App() {
 
       {loading && <LoadingState />}
 
-      {!loading && !results && !error && (
+      {!loading && !results && !error && !rateLimited && (
         <EmptyState onSelect={fillExample} />
       )}
 

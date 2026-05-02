@@ -1,12 +1,13 @@
 import os
-from fastapi import FastAPI, HTTPException, Request
+import datetime
+from collections import defaultdict, deque
+import time
+from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from agent import analyze
-from collections import defaultdict
-import time
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,23 +22,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-rate_limit_store = defaultdict(list)
-RATE_LIMIT = 5
-RATE_WINDOW = 3600
-
 DIST_DIR = os.path.join(os.path.dirname(__file__), "frontend", "dist")
 
+request_log: dict = defaultdict(deque)
+RATE_LIMIT = 5
+WINDOW = 3600
 
-def check_rate_limit(ip: str) -> bool:
+
+def get_client_ip(request: Request) -> str:
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host or "unknown"
+
+
+def check_rate_limit(request: Request):
+    ip = get_client_ip(request)
     now = time.time()
-    reqs = rate_limit_store[ip]
-    reqs = [r for r in reqs if now - r < RATE_WINDOW]
-    rate_limit_store[ip] = reqs
-    if len(reqs) >= RATE_LIMIT:
-        return False
-    reqs.append(now)
-    rate_limit_store[ip] = reqs
-    return True
+    while request_log[ip] and request_log[ip][0] < now - WINDOW:
+        request_log[ip].popleft()
+    if len(request_log[ip]) >= RATE_LIMIT:
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded. 5 analyses per hour per IP. This keeps the demo free for everyone."
+        )
+    request_log[ip].append(now)
 
 
 class GoalRequest(BaseModel):
@@ -46,11 +55,7 @@ class GoalRequest(BaseModel):
 
 
 @app.post("/analyze")
-async def analyze_endpoint(request: Request, body: GoalRequest):
-    ip = request.client.host
-    if not check_rate_limit(ip):
-        raise HTTPException(status_code=429, detail="Rate limit exceeded. Max 5 requests per hour per IP.")
-
+async def analyze_endpoint(request: Request, body: GoalRequest, _=Depends(check_rate_limit)):
     goal = body.goal.strip()
     domain = body.domain.strip() if body.domain else "general"
 
@@ -58,6 +63,9 @@ async def analyze_endpoint(request: Request, body: GoalRequest):
         raise HTTPException(status_code=400, detail="Goal must be at least 3 characters.")
     if len(goal) > 500:
         raise HTTPException(status_code=400, detail="Goal must be under 500 characters.")
+
+    ip = get_client_ip(request)
+    print(f"[{datetime.datetime.now().isoformat()}] Analysis requested: goal='{goal}' domain='{domain}' ip={ip}")
 
     try:
         result = analyze(goal, domain)
@@ -71,7 +79,6 @@ async def health():
     return {"status": "ok"}
 
 
-# Serve Vite build assets
 assets_dir = os.path.join(DIST_DIR, "assets")
 if os.path.exists(assets_dir):
     app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
