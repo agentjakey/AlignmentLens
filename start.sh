@@ -1,11 +1,10 @@
 #!/bin/bash
-# Start backend on port 8000 (background)
-/home/runner/workspace/.pythonlibs/bin/uvicorn main:app --host 0.0.0.0 --port 8000 &
-BACKEND_PID=$!
+set -e
 
-# Start frontend dev server on port 5000 (foreground, this is what Replit watches)
+echo "==> Building frontend..."
 cd /home/runner/workspace/frontend
-npm run dev
+npm run build
 
-# If frontend exits, kill backend too
-kill $BACKEND_PID
+echo "==> Starting server on port 5000..."
+cd /home/runner/workspace
+/home/runner/workspace/.pythonlibs/bin/uvicorn main:app --host 0.0.0.0 --port 5000

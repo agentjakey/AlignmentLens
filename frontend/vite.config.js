@@ -8,9 +8,5 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5000,
     allowedHosts: true,
-    proxy: {
-      '/analyze': 'http://localhost:8000',
-      '/health': 'http://localhost:8000',
-    },
   },
 })

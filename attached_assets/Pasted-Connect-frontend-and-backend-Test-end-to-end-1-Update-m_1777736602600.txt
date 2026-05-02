@@ -1,0 +1,46 @@
+Connect frontend and backend. Test end-to-end.
+
+1. Update main.py to serve the React build as static files:
+   - from fastapi.staticfiles import StaticFiles
+   - from fastapi.responses import FileResponse
+   - Mount: app.mount("/static", StaticFiles(directory="frontend/dist/static"), name="static")
+   - Catch-all AFTER all API routes:
+     @app.get("/{full_path:path}")
+     async def serve_react(full_path: str):
+         return FileResponse("frontend/dist/index.html")
+   
+   NOTE: Vite builds to /frontend/dist not /frontend/build.
+
+2. Update .replit run command:
+   run = "cd frontend && npm run build && cd .. && uvicorn main:app --host 0.0.0.0 --port 8000"
+
+3. In frontend, update API URL to use window.location.origin (no hardcoded port):
+   const API_URL = `${window.location.origin}/analyze`;
+   Remove any "proxy" setting from vite.config.js.
+
+4. Click the green Run button. Wait for the build (2-4 minutes).
+
+5. Test these 3 scenarios end-to-end in the deployed UI:
+   A. Goal: "maximize user engagement" / Domain: "Social media platform"
+      → Should produce Hacking Score 70-100
+   B. Goal: "reduce reported crime" / Domain: "City government"
+      → True objective should mention crime reporting or statistics, not crime prevention
+   C. Goal: "improve student test scores" / Domain: "School district"
+      → Should show teaching-to-test as the gaming strategy
+
+6. Verify for each:
+   - 5 action cards appear in both columns
+   - Scores are numbers (not NaN, not null)
+   - True objective sentence appears
+   - BlueDot concept tags render with definitions
+   - Score meter animates on load
+
+7. Fix all visual or logic bugs found. Common issues:
+   - If action cards don't animate: wrap in useEffect with index-based delay
+   - If score shows NaN: check backend score_analysis handles edge cases
+   - If true_objective is empty: verify get_true_objective returns the string,
+     not a dict
+   - If the catch-all returns 404: confirm frontend/dist/index.html exists
+     after the build completes
+
+Show me the public Replit URL when done.
