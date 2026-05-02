@@ -12,12 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-if not os.path.exists("frontend/dist"):
-    print("==> Frontend not built. Building now...")
-    subprocess.run(["npm", "install"], cwd="frontend", check=True)
-    subprocess.run(["npm", "run", "build"], cwd="frontend", check=True)
-    print("==> Frontend build complete.")
-
 app = FastAPI(title="AlignmentLens API")
 
 app.add_middleware(
