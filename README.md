@@ -130,6 +130,7 @@ Get a key at [console.anthropic.com](https://console.anthropic.com). Claude Haik
 ---
 
 ## Project structure
+
 AlignmentLens/
 ├── main.py              # FastAPI app, routes, static file serving
 ├── agent.py             # Three-call LLM architecture, scoring logic
