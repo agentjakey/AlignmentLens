@@ -125,8 +125,7 @@ naturally. The patterns it generates are structurally accurate and grounded in
 real documented cases of specification gaming, but AlignmentLens is a teaching
 tool, not a research artifact.
 
-The framing in the UI reflects this. The methodology is documented in
-[CLAUDE.md](./CLAUDE.md).
+The framing in the UI reflects this. 
 
 ---
 
