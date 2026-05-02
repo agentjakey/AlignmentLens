@@ -306,4 +306,4 @@ Physics, UC San Diego
 AI Researcher @ American Refrigeration, Inc.
 NeurIPS ML4PS 2025 co-author
 
-[GitHub](https://github.com/agentjakey) · [LinkedIn](https://linkedin.com/in/jacob-ortiz-ucsd)
+[GitHub](https://github.com/agentjakey) · [LinkedIn](https://www.linkedin.com/in/jacob-ortiz-ab6421348/)
